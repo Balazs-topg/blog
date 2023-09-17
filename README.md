@@ -9,3 +9,6 @@ The purpose of this project is to learn (esspecially backend APIs). This project
 - Next.js *(framework, backend + frontend)*
 - Tailwind *(styling)*
 - NextUI *(component library)*
+
+## details + more
+The app will have login/signup and a demo account, so there will be authorization logic.
