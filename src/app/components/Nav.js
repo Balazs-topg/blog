@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Input, Button } from "@nextui-org/react";
 import React from "react";
 
-function Nav() {
+function Nav({ isLoggedIn = false }) {
   return (
     <nav className="bg-zinc-700 border-b border-zinc-600 text-white py-2 px-4 dark sticky shadow-lg">
       <div className="mx-auto max-w-5xl flex gap-4 justify-between items-center">
@@ -29,10 +29,22 @@ function Nav() {
             </svg>
           }
         />
-
-        <Link href="authenticate">
-          <Button color="primary">Log in</Button>
-        </Link>
+        {isLoggedIn ? null : (
+          <Link href="authenticate">
+            <Button color="primary">Log in</Button>
+          </Link>
+        )}
+        {isLoggedIn ? (
+          <Button
+            color="primary"
+            onClick={() => {
+              localStorage.removeItem("jwt");
+              location.reload();
+            }}
+          >
+            Sign out
+          </Button>
+        ) : null}
       </div>
     </nav>
   );

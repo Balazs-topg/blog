@@ -30,7 +30,7 @@ function Page() {
 
   return (
     <NextUIProvider>
-      <Nav></Nav>
+      <Nav isLoggedIn={isLoggedIn}></Nav>
       <div className="flex flex-col items-center dark mx-auto max-w-lg py-8 px-4">
         <h1 className="text-white text-2xl font-bold mb-2">
           Welcome {isLoggedIn.username ? isLoggedIn.username : null}!

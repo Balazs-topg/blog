@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useEffect } from "react";
+
 import Nav from "./components/Nav";
 
 import Image from "next/image";
@@ -57,9 +59,35 @@ function Card({ title, author, time, content, id }) {
 }
 
 export default function Home() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem("jwt")) {
+      const fetchUserData = async () => {
+        const jwt = localStorage.getItem("jwt");
+        console.log("getting user data... ");
+        try {
+          const response = await fetch("/api/get-user-data", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ jwt }),
+          });
+          const data = await response.json();
+          console.log("api responded with: ", data);
+          setIsLoggedIn(data);
+        } catch (error) {
+          console.error("api failed: ", error);
+        }
+      };
+      fetchUserData();
+    }
+  }, []);
+
   return (
     <NextUIProvider>
-      <Nav></Nav>
+      <Nav isLoggedIn={isLoggedIn} />
       <div className="mx-auto max-w-xl space-y-6 py-8">
         <Card title="Sample text" content="lorem bruh"></Card>
         <Card title="Sample text" content="lorem bruh"></Card>
