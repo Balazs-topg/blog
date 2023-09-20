@@ -1,46 +1,173 @@
 "use client";
 import React, { useRef, useState } from "react";
-import { Checkbox, NextUIProvider } from "@nextui-org/react";
-import { Tabs, Tab, Card, CardBody, Input, Button } from "@nextui-org/react";
+import {
+  Checkbox,
+  NextUIProvider,
+  Tabs,
+  Tab,
+  Card,
+  CardBody,
+  Input,
+  Button,
+  Spinner,
+} from "@nextui-org/react";
 import Nav from "../components/Nav";
+import { useRouter } from "next/navigation";
 
-function Page() {
+function SignUpForm() {
+  const router = useRouter();
+
   const usernameSignupRef = useRef();
   const emailSignupRef = useRef();
   const passwordSignupRef = useRef();
   const [consent, setConsent] = useState(false);
 
-  const handleSignup = async () => {
-    const username = usernameSignupRef.current.value;
-    const email = emailSignupRef.current.value;
-    const password = passwordSignupRef.current.value;
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [usernameIsTaken, setUsernameIsTaken] = useState(false);
+  const [emailIsTaken, setEmailIsTaken] = useState(false);
+  const [passwordIsWeak, setPasswordIsWeak] = useState(false);
+  const [serverError, setServerError] = useState(false);
 
-    console.log(username);
-    console.log(email);
-    console.log(password);
-    console.log(consent);
+  const handleSignup = async (e) => {
+    e.preventDefault(); // Prevent the default form submission behavior
+    console.log("yoo handleSignup is called");
+    setIsSubmitting(true);
 
-    if (!username || !email || !password || !consent) {
-      console.error("All fields are required");
-      return;
-    }
+    const signUpBody = {
+      username: usernameSignupRef.current.value,
+      email: emailSignupRef.current.value,
+      password: passwordSignupRef.current.value,
+    };
+    console.log(signUpBody);
 
+    //call backend API
     try {
       const response = await fetch("/api/sign-up", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, email, password, consent }),
+        body: JSON.stringify(signUpBody),
       });
-
       const data = await response.json();
-      console.log("Signup successful", data);
+      console.log("api responded with: ", data);
+
+      // Store the JWT in local storage
+      if (data.jwt) {
+        localStorage.setItem("jwt", data.jwt);
+      }
+
+      setUsernameIsTaken(data.usernameIsTaken);
+      setEmailIsTaken(data.emailIsTaken);
+      setPasswordIsWeak(data.passwordIsWeak);
+      setIsSubmitting(false);
+      data.SignupSuccessfull && router.push("/authenticate/sign-up-success");
     } catch (error) {
-      console.error("Signup failed", error);
+      console.error("api failed: ", error);
     }
   };
 
+  return (
+    <Card>
+      <CardBody className="bg-zinc-800">
+        <form className="space-y-6 flex flex-col" onSubmit={handleSignup}>
+          <Input
+            isRequired
+            ref={usernameSignupRef}
+            type="name"
+            label="Username"
+            variant="faded"
+            autocomplete="on"
+            isInvalid={usernameIsTaken}
+            errorMessage={
+              usernameIsTaken
+                ? "that username is alredy in use, please choose a different one"
+                : ""
+            }
+          />
+          <Input
+            isRequired
+            ref={emailSignupRef}
+            type="email"
+            label="Email"
+            variant="faded"
+            autocomplete="on"
+            isInvalid={emailIsTaken}
+            errorMessage={
+              emailIsTaken
+                ? "that email is alredy in use, please choose a different one"
+                : ""
+            }
+          />
+          <Input
+            isRequired
+            ref={passwordSignupRef}
+            type="password"
+            autocomplete="new-password"
+            label="Password"
+            variant="faded"
+            isInvalid={passwordIsWeak}
+            errorMessage={
+              passwordIsWeak
+                ? "please choose a password with 5 or more characters"
+                : ""
+            }
+          />
+          <Checkbox
+            isRequired
+            checked={consent}
+            onChange={(e) => setConsent(e.target.checked)}
+          >
+            I consent to my info being stored
+          </Checkbox>
+          <Button
+            type="submit"
+            variant="shadow"
+            color="secondary"
+            isRequired
+            isDisabled={isSubmitting ? true : false}
+          >
+            {isSubmitting && (
+              <Spinner size="sm" color="current" className=" mr-1" />
+            )}{" "}
+            Sign up
+          </Button>
+        </form>
+      </CardBody>
+    </Card>
+  );
+}
+
+function LoginForm() {
+  const handleLogin = () => {
+    // Add your login logic here
+    console.log("Handle login");
+  };
+
+  return (
+    <Card>
+      <CardBody className="bg-zinc-800">
+        <form className="space-y-6 flex flex-col">
+          <Input type="email" autocomplete="on" label="Email" variant="faded" />
+          <Input
+            type="password"
+            autocomplete="current-password"
+            label="Password"
+            variant="faded"
+          />
+          <Button variant="shadow" color="secondary" onClick={handleLogin}>
+            Log in
+          </Button>
+          <Button variant="ghost" color="secondary">
+            Log in as guest
+          </Button>
+        </form>
+      </CardBody>
+    </Card>
+  );
+}
+
+function Page() {
   return (
     <NextUIProvider>
       <Nav></Nav>
@@ -48,56 +175,10 @@ function Page() {
         <div className="bg-zinc-700 border border-zinc-600 p-4 rounded-2xl">
           <Tabs color="primary" fullWidth size="md" aria-label="Tabs form">
             <Tab key="LogIn" title="Log in">
-              <Card>
-                <CardBody className="bg-zinc-800 space-y-6">
-                  <Input type="email" label="Email" variant="faded" />
-                  <Input type="password" label="Password" variant="faded" />
-                  <Button variant="shadow" color="secondary">
-                    Log in
-                  </Button>
-                  <Button variant="ghost" color="secondary">
-                    Log in as guest
-                  </Button>
-                </CardBody>
-              </Card>
+              <LoginForm />
             </Tab>
             <Tab key="SignUp" title="Sign up">
-              <Card>
-                <CardBody className="bg-zinc-800 space-y-6">
-                  <Input
-                    ref={usernameSignupRef}
-                    type="name"
-                    label="Username"
-                    variant="faded"
-                  />
-                  <Input
-                    ref={emailSignupRef}
-                    type="email"
-                    label="Email"
-                    variant="faded"
-                  />
-                  <Input
-                    ref={passwordSignupRef}
-                    type="password"
-                    label="Password"
-                    variant="faded"
-                  />
-                  <Checkbox
-                    checked={consent}
-                    onChange={(e) => setConsent(e.target.checked)}
-                  >
-                    I consent to my info being stored
-                  </Checkbox>
-                  <Button
-                    variant="shadow"
-                    color="secondary"
-                    onClick={handleSignup}
-                    isRequired
-                  >
-                    Sign up
-                  </Button>
-                </CardBody>
-              </Card>
+              <SignUpForm />
             </Tab>
           </Tabs>
         </div>

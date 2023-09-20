@@ -24,10 +24,10 @@ export default async function handler(req, res) {
   let responseMessageToClient = {
     status: undefined,
     message: undefined,
-    usernameIsTaken: undefined,
-    emailIsTaken: undefined,
-    passwordIsWeak: undefined,
-    jwt: undefined,
+    usernameIsTaken: false,
+    emailIsTaken: false,
+    passwordIsWeak: false,
+    jwt: false,
     SignupSuccessfull: false,
   };
 
