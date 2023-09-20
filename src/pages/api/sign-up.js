@@ -1,7 +1,11 @@
 import mongoose from "mongoose";
-require("dotenv").config();
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { config } from "dotenv";
+config();
 
-const accountSignupSchema = new mongoose.Schema(
+// database stuffs
+const accountSchema = new mongoose.Schema(
   {
     email: { type: String, required: true },
     username: { type: String, required: true },
@@ -9,29 +13,93 @@ const accountSignupSchema = new mongoose.Schema(
   },
   { versionKey: false }
 );
-
-const accountSignupModel =
-  mongoose.models.accounts || mongoose.model("accounts", accountSignupSchema);
+const accountModel =
+  mongoose.models.accounts || mongoose.model("accounts", accountSchema);
 
 export default async function handler(req, res) {
+  const requestBody = req.body;
+  console.log("handeling signup for: ", requestBody);
+
+  //init response message
+  let responseMessageToClient = {
+    status: undefined,
+    message: undefined,
+    usernameIsTaken: undefined,
+    emailIsTaken: undefined,
+    passwordIsWeak: undefined,
+    jwt: undefined,
+    SignupSuccessfull: false,
+  };
+
+  //init internalRequestStatus (we don't want to share these with the frontend client for security reasons)
+  let internalRequestStatus = {
+    databaseConnectionFail: undefined,
+    databaseAppendFail: undefined,
+  };
+
+  //database connect
   try {
     await mongoose.connect(process.env.MONGODB_URI);
-    console.log("connected to mongo!");
+    internalRequestStatus.databaseConnectionFail = false;
   } catch (error) {
-    console.error("Failed to connect to mongo", error);
-    res.status(500).json({ message: "Internal server error" });
-    return;
+    internalRequestStatus.databaseConnectionFail = true;
+    responseMessageToClient.error = 500;
   }
 
-  const body = req.body;
-  console.log("body", body);
+  //check if username or email is taken
+  const isEmailTaken =
+    (await accountModel.countDocuments({ email: requestBody.email })) > 0;
+  const isUsernameTaken =
+    (await accountModel.countDocuments({ username: requestBody.username })) > 0;
 
-  try {
-    const signUpDataToModel = new accountSignupModel(body);
-    await signUpDataToModel.save();
-    res.status(200).json({ message: "Signup successful" });
-  } catch (error) {
-    console.error("Failed to save data", error);
-    res.status(500).json({ message: "Internal server error" });
+  if (isEmailTaken) {
+    responseMessageToClient.emailIsTaken = true;
+    responseMessageToClient.status = 400;
   }
+  if (isUsernameTaken) {
+    responseMessageToClient.usernameIsTaken = true;
+    responseMessageToClient.status = 400;
+  }
+
+  //check if password is weak
+  if (requestBody.password.length < 5) {
+    responseMessageToClient.passwordIsWeak = true;
+    responseMessageToClient.status = 400;
+  }
+
+  //add to database
+  if (
+    !(
+      responseMessageToClient.emailIsTaken ||
+      responseMessageToClient.usernameIsTaken ||
+      responseMessageToClient.passwordIsWeak
+    )
+  ) {
+    try {
+      const hashedPassword = await bcrypt.hash(requestBody.password, 10);
+      const signUpDataToModel = new accountModel({
+        ...requestBody,
+        password: hashedPassword,
+      });
+      await signUpDataToModel.save();
+
+      responseMessageToClient.jwt = jwt.sign(
+        { id: process.env.JWT_SECRET_KEY, username: username },
+        secretKey,
+        { expiresIn: "28d" }
+      );
+
+      responseMessageToClient.SignupSuccessfull = true;
+      responseMessageToClient.status = 200;
+    } catch (error) {
+      internalRequestStatus.databaseAppendFail = false;
+      responseMessageToClient.status = 500;
+      console.log("error databaseAppendFail: ", error);
+    }
+  }
+
+  //respond to client
+  console.log("responding with: ", responseMessageToClient);
+  res.status(responseMessageToClient.status).send(responseMessageToClient);
+  console.log("handeled!");
 }
