@@ -79,6 +79,8 @@ export default async function handler(req, res) {
       const hashedPassword = await bcrypt.hash(requestBody.password, 10);
       const signUpDataToModel = new accountModel({
         ...requestBody,
+        username: requestBody.username,
+        email: requestBody.email,
         password: hashedPassword,
       });
       await signUpDataToModel.save();
