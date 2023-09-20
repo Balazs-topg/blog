@@ -78,26 +78,32 @@ export default async function handler(req, res) {
     try {
       const hashedPassword = await bcrypt.hash(requestBody.password, 10);
       const signUpDataToModel = new accountModel({
-        ...requestBody,
         username: requestBody.username,
         email: requestBody.email,
         password: hashedPassword,
       });
       await signUpDataToModel.save();
 
-      responseMessageToClient.jwt = jwt.sign(
-        { id: process.env.JWT_SECRET_KEY, username: username },
-        secretKey,
-        { expiresIn: "28d" }
-      );
-
       responseMessageToClient.SignupSuccessfull = true;
       responseMessageToClient.status = 200;
     } catch (error) {
-      internalRequestStatus.databaseAppendFail = false;
+      internalRequestStatus.databaseAppendFail = true;
       responseMessageToClient.status = 500;
       console.log("error databaseAppendFail: ", error);
     }
+  }
+
+  //add jwt
+  if (responseMessageToClient.status === 200) {
+    await accountModel
+      .findOne({ username: requestBody.username })
+      .then((user) => {
+        responseMessageToClient.jwt = jwt.sign(
+          { id: user._id, username: requestBody.username },
+          process.env.JWT_SECRET_KEY,
+          { expiresIn: "28d" }
+        );
+      });
   }
 
   //respond to client
