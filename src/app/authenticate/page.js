@@ -53,8 +53,15 @@ function SignUpForm() {
       console.log("api responded with: ", data);
 
       // Store the JWT in local storage
-      if (data.jwt) {
+      if (data.SignupSuccessfull) {
         localStorage.setItem("jwt", data.jwt);
+        localStorage.setItem(
+          "userInfo",
+          JSON.stringify({
+            username: signUpBody.username,
+            email: signUpBody.email,
+          })
+        );
       }
 
       setUsernameIsTaken(data.usernameIsTaken);
@@ -139,23 +146,87 @@ function SignUpForm() {
 }
 
 function LoginForm() {
-  const handleLogin = () => {
-    // Add your login logic here
-    console.log("Handle login");
+  const router = useRouter();
+
+  const emailLoginRef = useRef();
+  const passwordLoginRef = useRef();
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loginError, setLoginError] = useState(false);
+
+  const handleLogin = async () => {
+    setIsSubmitting(true);
+    const loginBody = {
+      email: emailLoginRef.current.value,
+      password: passwordLoginRef.current.value,
+    };
+
+    try {
+      const response = await fetch("/api/log-in", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginBody),
+      });
+      const data = await response.json();
+
+      if (data.jwt) {
+        localStorage.setItem("jwt", data.jwt);
+        localStorage.setItem(
+          "userInfo",
+          JSON.stringify({ email: loginBody.email, username: data.username })
+        );
+        router.push("/");
+      } else {
+        setLoginError(true);
+      }
+    } catch (error) {
+      console.error("Login failed:", error);
+      setLoginError(true);
+    }
+
+    setIsSubmitting(false);
   };
 
   return (
     <Card>
       <CardBody className="bg-zinc-800">
-        <form className="space-y-6 flex flex-col">
-          <Input type="email" autocomplete="on" label="Email" variant="faded" />
+        <form
+          className="space-y-6 flex flex-col"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleLogin();
+          }}
+        >
           <Input
+            ref={emailLoginRef}
+            type="email"
+            autocomplete="on"
+            label="Email"
+            variant="faded"
+            isInvalid={loginError}
+          />
+          <Input
+            ref={passwordLoginRef}
             type="password"
             autocomplete="current-password"
             label="Password"
             variant="faded"
+            isInvalid={loginError}
           />
-          <Button variant="shadow" color="secondary" onClick={handleLogin}>
+          {loginError && (
+            <p className="text-rose-500">Invalid email or password</p>
+          )}
+          <Button
+            type="submit"
+            variant="shadow"
+            color="secondary"
+            isDisabled={isSubmitting ? true : false}
+          >
+            {isSubmitting && (
+              <Spinner size="sm" color="current" className=" mr-1" />
+            )}{" "}
             Log in
           </Button>
           <Button variant="ghost" color="secondary">

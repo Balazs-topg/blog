@@ -1,8 +1,12 @@
 import Link from "next/link";
 import { Input, Button } from "@nextui-org/react";
-import React from "react";
+import React, { useState } from "react";
 
-function Nav({ isLoggedIn = false }) {
+function Nav() {
+  const [userInfo, setUserInfo] = useState(
+    JSON.parse(localStorage.getItem("userInfo"))
+  );
+
   return (
     <nav className="bg-zinc-700 border-b border-zinc-600 text-white py-2 px-4 dark sticky shadow-lg">
       <div className="mx-auto max-w-5xl flex gap-4 justify-between items-center">
@@ -29,16 +33,17 @@ function Nav({ isLoggedIn = false }) {
             </svg>
           }
         />
-        {isLoggedIn ? null : (
+        {userInfo ? null : (
           <Link href="authenticate">
             <Button color="primary">Log in</Button>
           </Link>
         )}
-        {isLoggedIn ? (
+        {userInfo ? (
           <Button
             color="primary"
             onClick={() => {
               localStorage.removeItem("jwt");
+              localStorage.removeItem("userInfo");
               location.reload();
             }}
           >

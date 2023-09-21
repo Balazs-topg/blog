@@ -87,7 +87,7 @@ export default function Home() {
 
   return (
     <NextUIProvider>
-      <Nav isLoggedIn={isLoggedIn} />
+      <Nav />
       <div className="mx-auto max-w-xl space-y-6 py-8">
         <Card title="Sample text" content="lorem bruh"></Card>
         <Card title="Sample text" content="lorem bruh"></Card>
