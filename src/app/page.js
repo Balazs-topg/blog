@@ -13,7 +13,9 @@ import { Button, Input } from "@nextui-org/react";
 function Card({ title, author, time, content, id }) {
   return (
     <div className="bg-zinc-700 border border-zinc-600 rounded-2xl text-white p-4 space-y-2 shadow-lg transition-background">
-      <div className=" font-semibold">{title}</div>
+      <div className=" font-semibold">
+        {title} <span className=" opacity-60"> - {author}</span>
+      </div>
       <p>{content} </p>
       <div className="flex items-center gap-3">
         <Button isIconOnly color="primary" aria-label="Like" variant="shadow">
@@ -60,39 +62,39 @@ function Card({ title, author, time, content, id }) {
 
 export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    if (localStorage.getItem("jwt")) {
-      const fetchUserData = async () => {
-        const jwt = localStorage.getItem("jwt");
-        console.log("getting user data... ");
-        try {
-          const response = await fetch("/api/get-user-data", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ jwt }),
-          });
-          const data = await response.json();
-          console.log("api responded with: ", data);
-          setIsLoggedIn(data);
-        } catch (error) {
-          console.error("api failed: ", error);
-        }
-      };
-      fetchUserData();
-    }
+    const fetchPosts = async () => {
+      const response = await fetch("/api/posts/front-page", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      console.log(data);
+      setPosts(data);
+    };
+    fetchPosts();
   }, []);
 
   return (
     <NextUIProvider>
       <Nav />
       <div className="mx-auto max-w-xl space-y-6 py-8">
-        <Card title="Sample text" content="lorem bruh"></Card>
-        <Card title="Sample text" content="lorem bruh"></Card>
-        <Card title="Sample text" content="lorem bruh"></Card>
-        <Card title="Sample text" content="lorem bruh"></Card>
+        {posts.length > 0 &&
+          posts.map((postData) => {
+            return (
+              <Card
+                key={postData.id}
+                title={postData.title}
+                content={postData.message}
+                author={postData.author}
+              ></Card>
+            );
+            // <Card title={postData.title} content="lorem bruh"></Card>;
+          })}
       </div>
       <div className="w-full bg-zinc-800 h-screen fixed z-[-1] top-0 left-0"></div>
     </NextUIProvider>

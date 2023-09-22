@@ -3,8 +3,8 @@ import jwt from "jsonwebtoken";
 import { config } from "dotenv";
 config();
 
-import postModel from "./models/post";
-import accountModel from "./models/account";
+import postModel from "../models/post";
+import accountModel from "../models/account";
 
 let isConnected;
 const connectToDatabase = async () => {

@@ -30,7 +30,7 @@ function Page() {
     const token = localStorage.getItem("jwt");
 
     try {
-      const response = await fetch("/api/make-post", {
+      const response = await fetch("/api/posts/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
