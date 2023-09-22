@@ -70,6 +70,8 @@ function SignUpForm() {
       setIsSubmitting(false);
       data.SignupSuccessfull && router.push("/authenticate/sign-up-success");
     } catch (error) {
+      setServerError(true);
+      setIsSubmitting(false);
       console.error("api failed: ", error);
     }
   };
@@ -127,6 +129,12 @@ function SignUpForm() {
           >
             I consent to my info being stored
           </Checkbox>
+          {serverError && (
+            <p className="text-rose-500">
+              server error, please try again later
+            </p>
+          )}
+
           <Button
             type="submit"
             variant="shadow"

@@ -3,27 +3,8 @@ import jwt from "jsonwebtoken";
 import { config } from "dotenv";
 config();
 
-// database stuffs
-const postSchema = new mongoose.Schema(
-  {
-    author: { type: String, required: true },
-    title: { type: String, required: true },
-    message: { type: String, required: true },
-  },
-  { versionKey: false }
-);
-const postModel = mongoose.models.posts || mongoose.model("posts", postSchema);
-
-const accountSchema = new mongoose.Schema(
-  {
-    email: { type: String, required: true },
-    username: { type: String, required: true },
-    password: { type: String, required: true },
-  },
-  { versionKey: false }
-);
-const accountModel =
-  mongoose.models.accounts || mongoose.model("accounts", accountSchema);
+import postModel from "./models/post";
+import accountModel from "./models/account";
 
 export default async function handler(req, res) {
   const requestBody = req.body;
