@@ -6,9 +6,24 @@ config();
 
 import accountModel from "./models/account";
 
+let isConnected;
+const connectToDatabase = async () => {
+  if (isConnected) {
+    console.log("Using existing database connection");
+    return;
+  }
+  console.log("Creating new database connection");
+  const db = await mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+  isConnected = db.connections[0].readyState;
+};
+
 export default async function handler(req, res) {
   const requestBody = req.body;
   console.log("handeling signup for: ", requestBody);
+  connectToDatabase();
 
   //init response message
   let responseMessageToClient = {
@@ -26,15 +41,6 @@ export default async function handler(req, res) {
     databaseConnectionFail: undefined,
     databaseAppendFail: undefined,
   };
-
-  //database connect
-  try {
-    await mongoose.connect(process.env.MONGODB_URI);
-    internalRequestStatus.databaseConnectionFail = false;
-  } catch (error) {
-    internalRequestStatus.databaseConnectionFail = true;
-    responseMessageToClient.error = 500;
-  }
 
   //check if username or email is taken
   const isEmailTaken =

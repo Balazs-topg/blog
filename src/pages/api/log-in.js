@@ -6,9 +6,24 @@ config();
 
 import accountModel from "./models/account";
 
+let isConnected;
+const connectToDatabase = async () => {
+  if (isConnected) {
+    console.log("Using existing database connection");
+    return;
+  }
+  console.log("Creating new database connection");
+  const db = await mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+  isConnected = db.connections[0].readyState;
+};
+
 export default async function loginHandler(req, res) {
   const requestBody = req.body;
   console.log("handling login for:", requestBody);
+  connectToDatabase();
 
   let responseMessageToClient = {
     status: undefined,
@@ -17,16 +32,6 @@ export default async function loginHandler(req, res) {
     jwt: null,
     loginSuccessful: false,
   };
-
-  // Database connect
-  try {
-    await mongoose.connect(process.env.MONGODB_URI);
-  } catch (error) {
-    console.error("Database connection failed:", error);
-    responseMessageToClient.status = 500;
-    res.status(500).send(responseMessageToClient);
-    return;
-  }
 
   // Check if email exists and get username if it does
   const user = await accountModel.findOne({ email: requestBody.email });

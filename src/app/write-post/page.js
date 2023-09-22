@@ -41,7 +41,7 @@ function Page() {
 
       if (response.ok) {
         console.log("Data submitted successfully");
-        router.push("/post-submitted");
+        router.push("/write-post/post-submitted");
       } else {
         setSubmissionError(true);
       }
