@@ -23,7 +23,7 @@ const connectToDatabase = async () => {
 export default async function handler(req, res) {
   const requestBody = req.body;
   console.log("handeling make-post for: ", requestBody);
-  connectToDatabase()
+  connectToDatabase();
 
   //catch empty bodies
   if (
@@ -54,13 +54,13 @@ export default async function handler(req, res) {
   const decodedJwt = jwt.verify(token, process.env.JWT_SECRET_KEY);
   const userId = decodedJwt.id;
 
-
   //add to database
   try {
     const postDataToModel = new postModel({
       author: userId,
       title: requestBody.title,
       message: requestBody.message,
+      timeOfPost: new Date(),
     });
     await postDataToModel.save();
 

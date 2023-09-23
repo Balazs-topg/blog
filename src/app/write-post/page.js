@@ -74,7 +74,10 @@ function Page() {
             type="submit"
             disabled={isSubmitting}
           >
-            {isSubmitting ? <Spinner size="small" /> : "Post"}
+            {isSubmitting ? (
+              <Spinner size="sm" color="current" className=" mr-1" />
+            ) : null}{" "}
+            Post
           </Button>
           {submissionError && (
             <p className="text-red-500 mt-2">
