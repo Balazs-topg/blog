@@ -20,25 +20,40 @@ const connectToDatabase = async () => {
   isConnected = db.connections[0].readyState;
 };
 
-const handleLike = (user, postIdString) => {
+const handleLike = (user, postIdString, posts) => {
+  if (user.dislikes.map((id) => String(id)).includes(postIdString)) {
+    posts.numberOfDislikes--;
+  }
   if (!user.likes.map((id) => String(id)).includes(postIdString)) {
     user.likes.push(postIdString);
+    posts.numberOfLikes++;
   }
   user.dislikes = user.dislikes.filter((item) => String(item) !== postIdString);
 };
 
-const handleUnLike = (user, postIdString) => {
-  user.likes = user.likes.filter((item) => String(item) !== postIdString);
-};
-
-const handleDislike = (user, postIdString) => {
-  if (!user.dislikes.map((id) => String(id)).includes(postIdString)) {
-    user.dislikes.push(postIdString);
+const handleUnLike = (user, postIdString, posts) => {
+  if (user.likes.map((id) => String(id)).includes(postIdString)) {
+    posts.numberOfLikes--;
   }
   user.likes = user.likes.filter((item) => String(item) !== postIdString);
 };
 
-const handleUnDislike = (user, postIdString) => {
+const handleDislike = (user, postIdString, posts) => {
+  if (user.likes.map((id) => String(id)).includes(postIdString)) {
+    posts.numberOfLikes--;
+  }
+  if (!user.dislikes.map((id) => String(id)).includes(postIdString)) {
+    user.dislikes.push(postIdString);
+    posts.numberOfDislikes++;
+  }
+  user.likes = user.likes.filter((item) => String(item) !== postIdString);
+};
+
+const handleUnDislike = (user, postIdString, posts) => {
+  if (user.dislikes.map((id) => String(id)).includes(postIdString)) {
+    posts.numberOfDislikes--;
+  }
+
   user.dislikes = user.dislikes.filter((item) => String(item) !== postIdString);
 };
 
@@ -56,25 +71,27 @@ export default async function likeHandler(req, res) {
 
   await connectToDatabase();
   const user = await accountModel.findById(decodedToken.id).exec();
+  const posts = await postModel.findById(postIdString).exec();
 
   switch (actionType) {
     case "like":
-      handleLike(user, postIdString);
+      handleLike(user, postIdString, posts);
       break;
     case "un-like":
-      handleUnLike(user, postIdString);
+      handleUnLike(user, postIdString, posts);
       break;
     case "dislike":
-      handleDislike(user, postIdString);
+      handleDislike(user, postIdString, posts);
       break;
     case "un-dislike":
-      handleUnDislike(user, postIdString);
+      handleUnDislike(user, postIdString, posts);
       break;
     default:
-      console.error("Invalid action:", actionType);
+      console.error("Invalid action:", actionType, posts);
   }
 
   await user.save();
+  await posts.save();
   res.status(200).send("Action handled successfully!");
   console.log("Handled!");
 }

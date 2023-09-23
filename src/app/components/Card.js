@@ -168,47 +168,6 @@ function Card({
   isLiked,
   isDisliked,
 }) {
-  // const like = async () => {
-  //   if (isLiked) {
-  //     setIsLiked(false);
-  //     const response = await fetch("/api/posts/like", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-  //       },
-  //       body: JSON.stringify({ postId: id, like: false, unlike: true }),
-  //     });
-  //   } else {
-  //     setIsLiked(true);
-  //     setIsDisliked(false);
-  //     const response = await fetch("/api/posts/like", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-  //       },
-  //       body: JSON.stringify({ postId: id, like: true, unlike: false }),
-  //     });
-  //   }
-  // };
-  // const dislike = async () => {
-  //   if (isDisliked) {
-  //     setIsDisliked(false);
-  //   } else {
-  //     setIsDisliked(true);
-  //     setIsLiked(false);
-  //   }
-
-  //   const response = await fetch("/api/posts/dislike", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //       Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-  //     },
-  //     body: JSON.stringify({ postId: id }),
-  //   });
-  // };
 
   return (
     <div className="bg-zinc-700 border border-zinc-600 rounded-2xl text-white p-4 space-y-2 shadow-lg transition-background">
