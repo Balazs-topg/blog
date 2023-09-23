@@ -56,6 +56,10 @@ const talkToBackendApi = async (postId, action) => {
 };
 
 function likeDislikeReducer(state, action) {
+  if (action.onMount) {
+    action.type === "like" && state.likeDislikeDiff--;
+    action.type === "dislike" && state.likeDislikeDiff++;
+  }
   switch (action.type) {
     case "like":
       //on un-like
@@ -69,7 +73,7 @@ function likeDislikeReducer(state, action) {
         };
       } //on like
       else {
-        talkToBackendApi(state.postId, "like");
+        !action.onLoad && talkToBackendApi(state.postId, "like");
         return {
           ...state,
           isDisliked: false,
@@ -89,7 +93,7 @@ function likeDislikeReducer(state, action) {
         };
       } //on dislike
       else {
-        talkToBackendApi(state.postId, "dislike");
+        !action.onLoad && talkToBackendApi(state.postId, "dislike");
         return {
           ...state,
           isDisliked: true,
@@ -109,13 +113,24 @@ function LikeDislike({
   postId,
 }) {
   const initialState = {
-    isLiked,
-    isDisliked,
+    isLiked: false,
+    isDisliked: false,
     postId,
     display: likeDislikeDiff,
     likeDislikeDiff,
   };
   const [state, dispatch] = useReducer(likeDislikeReducer, initialState);
+
+  const isLikedOnMount = isLiked;
+  const isDislikedOnMount = isDisliked;
+  useEffect(() => {
+    if (isLikedOnMount) {
+      dispatch({ type: "like", onMount: true });
+    }
+    if (isDislikedOnMount) {
+      dispatch({ type: "dislike", onMount: true });
+    }
+  }, []);
 
   return (
     <>
@@ -168,7 +183,6 @@ function Card({
   isLiked,
   isDisliked,
 }) {
-
   return (
     <div className="bg-zinc-700 border border-zinc-600 rounded-2xl text-white p-4 space-y-2 shadow-lg transition-background">
       <div className=" font-semibold">
