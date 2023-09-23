@@ -61,6 +61,8 @@ export default async function handler(req, res) {
       title: requestBody.title,
       message: requestBody.message,
       timeOfPost: new Date(),
+      numberOfLikes: 0,
+      numberOfDislikes: 0,
     });
     await postDataToModel.save();
 

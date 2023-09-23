@@ -27,7 +27,6 @@ export default async function loginHandler(req, res) {
   connectToDatabase();
 
   let allPosts = await postModel.find({}).lean();
-  let count = 0;
   allPosts = await Promise.all(
     allPosts.map(async (post) => {
       const authorDocument = await accountModel.findById(post.author);
@@ -35,6 +34,30 @@ export default async function loginHandler(req, res) {
       return post;
     })
   );
+
+  //decode jwt
+  const token = req.headers.authorization.split(" ")[1];
+  const decodedJwt = jwt.verify(token, process.env.JWT_SECRET_KEY);
+  const userId = decodedJwt.id;
+
+  const account = await accountModel.findById(userId);
+
+  allPosts.map((post) => {
+    if (account.likes.includes(String(post._id))) {
+      post.liked = true;
+      return post;
+    } else {
+      post.liked = false;
+    }
+  });
+  allPosts.map((post) => {
+    if (account.dislikes.includes(String(post._id))) {
+      post.disliked = true;
+      return post;
+    } else {
+      post.disliked = false;
+    }
+  });
 
   // Respond to client
   console.log("Responding with:", allPosts);

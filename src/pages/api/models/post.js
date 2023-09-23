@@ -6,6 +6,8 @@ const postSchema = new mongoose.Schema(
     title: { type: String, required: true },
     message: { type: String, required: true },
     timeOfPost: { type: Date, required: true },
+    numberOfLikes: { type: Number, required: true },
+    numberOfDislikes: { type: Number, required: true },
   },
   { versionKey: false }
 );

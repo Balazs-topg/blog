@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import { Input, Button } from "@nextui-org/react";
 import React, { useState } from "react";
@@ -21,7 +22,7 @@ function Nav() {
   const router = useRouter();
 
   return (
-    <nav className="bg-zinc-700 border-b border-zinc-600 text-white py-2 px-4 sticky shadow-lg dark">
+    <nav className="bg-zinc-700 border-b border-zinc-600 text-white py-2 px-4 sticky top-0 z-50 shadow-lg dark">
       <div className="mx-auto max-w-5xl flex gap-4 justify-between items-center">
         <div className="font-bold text-xl whitespace-nowrap">
           <Link href="/">COOL BLOG</Link>
