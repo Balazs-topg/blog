@@ -36,28 +36,30 @@ export default async function loginHandler(req, res) {
   );
 
   //decode jwt
-  const token = req.headers.authorization.split(" ")[1];
-  const decodedJwt = jwt.verify(token, process.env.JWT_SECRET_KEY);
-  const userId = decodedJwt.id;
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    const decodedJwt = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const userId = decodedJwt.id;
 
-  const account = await accountModel.findById(userId);
+    const account = await accountModel.findById(userId);
 
-  allPosts.map((post) => {
-    if (account.likes.includes(String(post._id))) {
-      post.liked = true;
-      return post;
-    } else {
-      post.liked = false;
-    }
-  });
-  allPosts.map((post) => {
-    if (account.dislikes.includes(String(post._id))) {
-      post.disliked = true;
-      return post;
-    } else {
-      post.disliked = false;
-    }
-  });
+    allPosts.map((post) => {
+      if (account.likes.includes(String(post._id))) {
+        post.liked = true;
+        return post;
+      } else {
+        post.liked = false;
+      }
+    });
+    allPosts.map((post) => {
+      if (account.dislikes.includes(String(post._id))) {
+        post.disliked = true;
+        return post;
+      } else {
+        post.disliked = false;
+      }
+    });
+  } catch {}
 
   // Respond to client
   console.log("Responding with:", allPosts);

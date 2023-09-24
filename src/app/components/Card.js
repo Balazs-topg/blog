@@ -123,6 +123,8 @@ function LikeDislike({
 
   const isLikedOnMount = isLiked;
   const isDislikedOnMount = isDisliked;
+
+  //deal with off-by-one on mount
   useEffect(() => {
     if (isLikedOnMount) {
       dispatch({ type: "like", onMount: true });
@@ -132,12 +134,17 @@ function LikeDislike({
     }
   }, []);
 
+  const [userInfo, setUserInfo] = useState(
+    JSON.parse(localStorage.getItem("userInfo"))
+  );
+
   return (
     <>
       <Button
         isIconOnly
         color="primary"
         aria-label="Like"
+        isDisabled={userInfo ? false : true}
         variant={state.isLiked ? "shadow" : ""}
         className={state.isLiked ? "-translate-y-0.5" : ""}
         onClick={() => {
@@ -150,6 +157,7 @@ function LikeDislike({
         isIconOnly
         color="danger"
         aria-label="Dislike"
+        isDisabled={userInfo ? false : true}
         variant={state.isDisliked ? "shadow" : ""}
         className={state.isDisliked ? "-translate-y-0.5" : ""}
         onClick={() => {
@@ -182,7 +190,12 @@ function Card({
   numberOfDislikes,
   isLiked,
   isDisliked,
+  setIsShowingLogInPrompt,
 }) {
+  const [userInfo, setUserInfo] = useState(
+    JSON.parse(localStorage.getItem("userInfo"))
+  );
+
   return (
     <div className="bg-zinc-700 border border-zinc-600 rounded-2xl text-white p-4 space-y-2 shadow-lg transition-background">
       <div className=" font-semibold">
@@ -196,12 +209,19 @@ function Card({
       </div>
       <p>{content} </p>
       <div className="flex items-center gap-3">
-        <LikeDislike
-          likeDislikeDiff={numberOfLikes - numberOfDislikes}
-          postId={id}
-          isLiked={isLiked}
-          isDisliked={isDisliked}
-        ></LikeDislike>
+        <div
+          className="flex items-center gap-3"
+          onClick={() => {
+            !userInfo && setIsShowingLogInPrompt(true);
+          }}
+        >
+          <LikeDislike
+            likeDislikeDiff={numberOfLikes - numberOfDislikes}
+            postId={id}
+            isLiked={isLiked}
+            isDisliked={isDisliked}
+          ></LikeDislike>
+        </div>
         <Button className="ml-auto">
           <div className="flex items-center gap-2">
             Read
