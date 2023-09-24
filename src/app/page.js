@@ -16,6 +16,8 @@ import { el, tr } from "date-fns/locale";
 import Card from "./components/Card";
 
 export default function Home() {
+  const router = useRouter();
+
   const [userInfo, setUserInfo] = useState(
     JSON.parse(localStorage.getItem("userInfo"))
   );
@@ -49,6 +51,7 @@ export default function Home() {
       {!userInfo ? (
         <LogInPrompt
           state={[isShowingLogInPrompt, setIsShowingLogInPrompt]}
+          router={router}
         ></LogInPrompt>
       ) : null}
       <div className="mx-auto max-w-xl space-y-6 py-8">
@@ -72,6 +75,7 @@ export default function Home() {
                 isLiked={postData.liked}
                 isDisliked={postData.disliked}
                 setIsShowingLogInPrompt={setIsShowingLogInPrompt}
+                router={router}
               ></Card>
             );
             // <Card title={postData.title} content="lorem bruh"></Card>;
@@ -94,9 +98,7 @@ import {
 } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 
-function LogInPrompt({ state }) {
-  const router = useRouter();
-
+function LogInPrompt({ state, router }) {
   const [isShowingLogInPrompt, setIsShowingLogInPrompt] = state;
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();

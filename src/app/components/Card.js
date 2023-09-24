@@ -191,13 +191,14 @@ function Card({
   isLiked,
   isDisliked,
   setIsShowingLogInPrompt,
+  router,
 }) {
   const [userInfo, setUserInfo] = useState(
     JSON.parse(localStorage.getItem("userInfo"))
   );
 
   return (
-    <div className="bg-zinc-700 border border-zinc-600 rounded-2xl text-white p-4 space-y-2 shadow-lg transition-background">
+    <div className="bg-zinc-700 border border-zinc-600 rounded-2xl text-white p-4 space-y-2 shadow-lg">
       <div className=" font-semibold">
         {title}{" "}
         <span className=" opacity-60">
@@ -222,7 +223,12 @@ function Card({
             isDisliked={isDisliked}
           ></LikeDislike>
         </div>
-        <Button className="ml-auto">
+        <Button
+          className="ml-auto"
+          onClick={() => {
+            router.push(`/posts/${id}`);
+          }}
+        >
           <div className="flex items-center gap-2">
             Read
             <svg
