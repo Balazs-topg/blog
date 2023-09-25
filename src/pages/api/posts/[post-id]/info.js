@@ -21,7 +21,7 @@ const connectToDatabase = async () => {
   isConnected = db.connections[0].readyState;
 };
 
-export default async function info(req, res) {
+export default async function infoHandler(req, res) {
   const requestBody = req.body;
   const {
     query: { "post-id": postId },

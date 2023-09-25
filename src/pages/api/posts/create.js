@@ -20,7 +20,7 @@ const connectToDatabase = async () => {
   isConnected = db.connections[0].readyState;
 };
 
-export default async function handler(req, res) {
+export default async function createHandler(req, res) {
   const requestBody = req.body;
   console.log("handeling make-post for: ", requestBody);
   connectToDatabase();

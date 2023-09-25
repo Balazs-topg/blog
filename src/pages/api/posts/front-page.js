@@ -21,7 +21,7 @@ const connectToDatabase = async () => {
   isConnected = db.connections[0].readyState;
 };
 
-export default async function loginHandler(req, res) {
+export default async function frontPageHandler(req, res) {
   const requestBody = req.body;
   console.log("handling frint-page for:", requestBody);
   connectToDatabase();

@@ -20,7 +20,7 @@ const connectToDatabase = async () => {
   isConnected = db.connections[0].readyState;
 };
 
-export default async function handler(req, res) {
+export default async function signupHandler(req, res) {
   const requestBody = req.body;
   console.log("handeling signup for: ", requestBody);
   connectToDatabase();
