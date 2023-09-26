@@ -8,8 +8,12 @@ const postSchema = new mongoose.Schema(
     timeOfPost: { type: Date, required: true },
     numberOfLikes: { type: Number, required: true },
     numberOfDislikes: { type: Number, required: true },
+    comments: { type: Array, required: true },
   },
-  { versionKey: false }
+  {
+    versionKey: false,
+    strict: false,
+  }
 );
 const postModel = mongoose.models.posts || mongoose.model("posts", postSchema);
 

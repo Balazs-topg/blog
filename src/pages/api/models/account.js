@@ -10,7 +10,7 @@ const accountSchema = new mongoose.Schema(
   },
   {
     versionKey: false,
-    strict: false, // Turn off strict mode
+    strict: false,
   }
 );
 

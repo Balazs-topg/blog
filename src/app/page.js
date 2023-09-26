@@ -33,17 +33,12 @@ export default function Home() {
         },
       });
       const data = await response.json();
-      console.log(data);
       setPosts(data);
     };
     fetchPosts();
   }, []);
 
   const [isShowingLogInPrompt, setIsShowingLogInPrompt] = useState(false);
-
-  useEffect(() => {
-    console.log(isShowingLogInPrompt);
-  }, [isShowingLogInPrompt]);
 
   return (
     <NextUIProvider>
