@@ -1,8 +1,8 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Nav from "@/app/components/Nav";
-import { NextUIProvider } from "@nextui-org/react";
+import { NextUIProvider, Spinner } from "@nextui-org/react";
 import { Button } from "@nextui-org/react";
 
 import { formatDistanceToNow } from "date-fns";
@@ -24,7 +24,7 @@ function DateComponent({ dateObj }) {
 
 function Comment({ children, author, authorUsername, timeOfComment }) {
   return (
-    <div className="bg-zinc-800 p-4 rounded-lg">
+    <div className="bg-zinc-800 p-4 rounded-2xl">
       <div className="flex gap-1 mb-2">
         <div className=" font-bold text-xs opacity-70">
           commented by: {authorUsername}
@@ -40,22 +40,43 @@ function Comment({ children, author, authorUsername, timeOfComment }) {
 
 export function Page({ params }) {
   const [pageInfo, setPageInfo] = useState(null);
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
 
+  const commentInputRef = useRef();
+
+  const fetchPageInfo = async () => {
+    console.log("fetching: ", `/api/posts/${params.postId}/info`);
+    const response = await fetch(`/api/posts/${params.postId}/info`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+      },
+    });
+    const data = await response.json();
+    setPageInfo(data);
+  };
   useEffect(() => {
-    const fetchPageInfo = async () => {
-      console.log("fetching: ", `/api/posts/${params.postId}/info`);
-      const response = await fetch(`/api/posts/${params.postId}/info`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-        },
-      });
-      const data = await response.json();
-      setPageInfo(data);
-    };
     fetchPageInfo();
   }, []);
+
+  async function sendCommentHandler(e) {
+    e.preventDefault();
+    setIsSubmittingComment(true);
+    const response = await fetch(`/api/posts/${params.postId}/comment`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+      },
+      body: JSON.stringify({ message: commentInputRef.current.value }),
+    });
+    const data = await response.json();
+    console.log(data);
+    setIsSubmittingComment(false);
+    commentInputRef.current.value = "";
+    fetchPageInfo();
+  }
 
   return (
     <NextUIProvider>
@@ -74,8 +95,9 @@ export function Page({ params }) {
           {pageInfo && <p>{pageInfo.message}</p>}
         </div>
         <div className="bg-zinc-700 border border-zinc-600 rounded-2xl text-white p-4 space-y-4 shadow-lg text-white">
-          <form onSubmit={() => {}} className="mb-4 w-full">
+          <form onSubmit={sendCommentHandler} className="mb-4 w-full">
             <textarea
+              ref={commentInputRef}
               name="message"
               id=""
               cols="30"
@@ -83,34 +105,31 @@ export function Page({ params }) {
               className="bg-zinc-800 rounded-xl w-full p-2 border-2 border-opacity-0 outline-none border-zinc-500 hover:border-opacity-100 transition-all"
               placeholder="Type comment here"
             ></textarea>
-            <Button variant="solid" color="primary" fullWidth type="submit">
-              send comment
+            <Button
+              fullWidth
+              type="submit"
+              variant="solid"
+              color="primary"
+              isDisabled={isSubmittingComment ? true : false}
+            >
+              {isSubmittingComment && (
+                <Spinner size="sm" color="current" className=" mr-1" />
+              )}
+              Send Comment
             </Button>
           </form>
-          <Comment authorUsername={"balazs"} timeOfComment={new Date()}>
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Culpa
-            veritatis, reiciendis numquam nihil rem possimus itaque vitae,
-            quidem ab similique inventore, voluptatum totam cum aliquid
-            accusantium hic provident amet maxime!
-          </Comment>
-          <Comment authorUsername={"balazs"} timeOfComment={new Date()}>
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Culpa
-            veritatis, reiciendis numquam nihil rem possimus itaque vitae,
-            quidem ab similique inventore, voluptatum totam cum aliquid
-            accusantium hic provident amet maxime!
-          </Comment>
-          <Comment authorUsername={"balazs"} timeOfComment={new Date()}>
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Culpa
-            veritatis, reiciendis numquam nihil rem possimus itaque vitae,
-            quidem ab similique inventore, voluptatum totam cum aliquid
-            accusantium hic provident amet maxime!
-          </Comment>
-          <Comment authorUsername={"balazs"} timeOfComment={new Date()}>
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Culpa
-            veritatis, reiciendis numquam nihil rem possimus itaque vitae,
-            quidem ab similique inventore, voluptatum totam cum aliquid
-            accusantium hic provident amet maxime!
-          </Comment>
+          {pageInfo &&
+            pageInfo.comments.map((comment) => {
+              return (
+                <Comment
+                  key={comment.timeOfComment}
+                  authorUsername={comment.authorUsername}
+                  timeOfComment={new Date(comment.timeOfComment)}
+                >
+                  {comment.message}
+                </Comment>
+              );
+            })}
         </div>
       </div>
       <div className="w-full bg-zinc-800 h-screen fixed z-[-1] top-0 left-0"></div>

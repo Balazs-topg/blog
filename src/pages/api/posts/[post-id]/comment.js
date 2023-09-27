@@ -47,11 +47,15 @@ export default async function commentHandler(req, res) {
   // account.save()
 
   let post = await postModel.findById(postIdString).exec();
-  post.comments.push({ message: requestBody.message, author: userId });
+  post.comments.push({
+    message: requestBody.message,
+    author: userId,
+    timeOfComment: new Date(),
+  });
   post.save();
 
   // Respond to client
   console.log("Responding with:", post);
-  res.status(200).send(post);
+  res.status(200).send({ success: true });
   console.log("Handled!");
 }

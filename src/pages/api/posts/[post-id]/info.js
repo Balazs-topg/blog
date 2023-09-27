@@ -34,6 +34,22 @@ export default async function infoHandler(req, res) {
   let post = await postModel.findById(postIdString);
   post = post.toObject();
 
+  const getCommentsWithAuthorUsername = async (post) => {
+    const commentsWithAuthorUsername = await Promise.all(
+      post.comments.map(async (comment) => {
+        let authorUsername = await accountModel.findById(comment.author);
+        console.log("authorUsername: ", authorUsername.username);
+        return {
+          ...comment,
+          authorUsername: authorUsername.username,
+        };
+      })
+    );
+    return commentsWithAuthorUsername;
+  };
+
+  post.comments = await getCommentsWithAuthorUsername(post);
+
   let account = await accountModel.findById(String(post.author));
   post.authorUsername = account.username;
 
