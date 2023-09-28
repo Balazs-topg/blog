@@ -92,7 +92,14 @@ function Nav() {
                 </Button>
               </DropdownTrigger>
               <DropdownMenu aria-label="Static Actions">
-                <DropdownItem key="new">View account</DropdownItem>
+                <DropdownItem
+                  key="new"
+                  onClick={() => {
+                    router.push(`users/${userInfo.username}`);
+                  }}
+                >
+                  View account
+                </DropdownItem>
                 <DropdownItem
                   key="edit"
                   onClick={() => {
