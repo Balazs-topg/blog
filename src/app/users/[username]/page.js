@@ -11,6 +11,7 @@ function Page({ params }) {
   const [userInfo, setUserInfo] = useState(
     JSON.parse(localStorage.getItem("userInfo"))
   );
+
   console.log(params);
 
   const [fetchedInfo, setFetchedInfo] = useState();

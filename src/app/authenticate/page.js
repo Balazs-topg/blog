@@ -13,6 +13,7 @@ import {
 } from "@nextui-org/react";
 import Nav from "../components/Nav";
 import { useRouter } from "next/navigation";
+import isBrowser from "../utils/isBrowser";
 
 function SignUpForm() {
   const router = useRouter();
@@ -53,15 +54,17 @@ function SignUpForm() {
       console.log("api responded with: ", data);
 
       // Store the JWT in local storage
-      if (data.SignupSuccessfull) {
-        localStorage.setItem("jwt", data.jwt);
-        localStorage.setItem(
-          "userInfo",
-          JSON.stringify({
-            username: signUpBody.username,
-            email: signUpBody.email,
-          })
-        );
+      if (isBrowser) {
+        if (data.SignupSuccessfull) {
+          localStorage.setItem("jwt", data.jwt);
+          localStorage.setItem(
+            "userInfo",
+            JSON.stringify({
+              username: signUpBody.username,
+              email: signUpBody.email,
+            })
+          );
+        }
       }
 
       setUsernameIsTaken(data.usernameIsTaken);

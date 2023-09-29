@@ -18,9 +18,14 @@ import Card from "./components/Card";
 export default function Home() {
   const router = useRouter();
 
-  const [userInfo, setUserInfo] = useState(
-    JSON.parse(localStorage.getItem("userInfo"))
-  );
+  const [userInfo, setUserInfo] = useState(null); // Set initial state to null
+
+  useEffect(() => {
+    // Access localStorage only after the component has mounted
+    const storedUserInfo = JSON.parse(localStorage.getItem("userInfo"));
+    setUserInfo(storedUserInfo);
+  }, []);
+
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {

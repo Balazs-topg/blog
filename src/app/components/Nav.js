@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { Input, Button } from "@nextui-org/react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { NextUIProvider } from "@nextui-org/react";
 
@@ -16,9 +16,14 @@ import {
 } from "@nextui-org/react";
 
 function Nav() {
-  const [userInfo, setUserInfo] = useState(
-    JSON.parse(localStorage.getItem("userInfo"))
-  );
+  const [userInfo, setUserInfo] = useState(null); // Set initial state to null
+
+  useEffect(() => {
+    // Access localStorage only after the component has mounted
+    const storedUserInfo = JSON.parse(localStorage.getItem("userInfo"));
+    setUserInfo(storedUserInfo);
+  }, []);
+
   const router = useRouter();
 
   return (

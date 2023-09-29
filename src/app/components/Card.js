@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect, useReducer } from "react";
 
 import { formatDistanceToNow } from "date-fns";
@@ -134,9 +135,13 @@ function LikeDislike({
     }
   }, []);
 
-  const [userInfo, setUserInfo] = useState(
-    JSON.parse(localStorage.getItem("userInfo"))
-  );
+  const [userInfo, setUserInfo] = useState(null);
+
+  useEffect(() => {
+    // Access localStorage only after the component has mounted
+    const storedUserInfo = JSON.parse(localStorage.getItem("userInfo"));
+    setUserInfo(storedUserInfo);
+  }, []);
 
   return (
     <>
@@ -193,9 +198,13 @@ function Card({
   setIsShowingLogInPrompt,
   router,
 }) {
-  const [userInfo, setUserInfo] = useState(
-    JSON.parse(localStorage.getItem("userInfo"))
-  );
+  const [userInfo, setUserInfo] = useState(null); // Set initial state to null
+
+  useEffect(() => {
+    // Access localStorage only after the component has mounted
+    const storedUserInfo = JSON.parse(localStorage.getItem("userInfo"));
+    setUserInfo(storedUserInfo);
+  }, []);
 
   function limitString(string = "", limit = 0) {
     return string.substring(0, limit);
