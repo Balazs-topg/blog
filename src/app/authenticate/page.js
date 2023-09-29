@@ -156,8 +156,8 @@ function SignUpForm() {
 function LoginForm() {
   const router = useRouter();
 
-  const emailLoginRef = useRef();
-  const passwordLoginRef = useRef();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loginError, setLoginError] = useState(false);
@@ -165,8 +165,8 @@ function LoginForm() {
   const handleLogin = async () => {
     setIsSubmitting(true);
     const loginBody = {
-      email: emailLoginRef.current.value,
-      password: passwordLoginRef.current.value,
+      email: email,
+      password: password,
     };
 
     try {
@@ -197,6 +197,11 @@ function LoginForm() {
     setIsSubmitting(false);
   };
 
+  const setGuestCredentials = () => {
+    setEmail("account@demo.com");
+    setPassword("12345");
+  };
+
   return (
     <Card>
       <CardBody className="bg-zinc-800">
@@ -208,20 +213,20 @@ function LoginForm() {
           }}
         >
           <Input
-            ref={emailLoginRef}
             type="email"
             autocomplete="on"
             label="Email"
             variant="faded"
             isInvalid={loginError}
+            value={email}
           />
           <Input
-            ref={passwordLoginRef}
             type="password"
             autocomplete="current-password"
             label="Password"
             variant="faded"
             isInvalid={loginError}
+            value={password}
           />
           {loginError && (
             <p className="text-rose-500">Invalid email or password</p>
@@ -237,7 +242,11 @@ function LoginForm() {
             )}{" "}
             Log in
           </Button>
-          <Button variant="ghost" color="secondary">
+          <Button
+            variant="ghost"
+            color="secondary"
+            onClick={setGuestCredentials}
+          >
             Log in as guest
           </Button>
         </form>
