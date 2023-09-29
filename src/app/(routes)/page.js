@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 
-import Nav from "./components/Nav";
+import Nav from "../components/Nav";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -13,7 +13,7 @@ import { Button, Input } from "@nextui-org/react";
 import { formatDistanceToNow } from "date-fns";
 import { el, tr } from "date-fns/locale";
 
-import Card from "./components/Card";
+import Card from "../components/Card";
 
 export default function Home() {
   const router = useRouter();

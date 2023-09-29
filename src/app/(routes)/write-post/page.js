@@ -7,7 +7,7 @@ import {
   Button,
   Spinner,
 } from "@nextui-org/react";
-import Nav from "../components/Nav";
+import Nav from "../../components/Nav";
 
 import { useRouter } from "next/navigation";
 
