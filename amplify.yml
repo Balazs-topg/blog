@@ -3,16 +3,12 @@ frontend:
   phases:
     preBuild:
       commands:
-        - nvm install 20
-        - nvm use 20 # This sets the Node.js version to 14. Adjust as needed.
-        - echo Installing dependencies...
         - npm ci
     build:
       commands:
-        - echo Building the project...
         - npm run build
   artifacts:
-    baseDirectory: dist
+    baseDirectory: .next
     files:
       - '**/*'
   cache:
