@@ -6,6 +6,7 @@ import Nav from "@/app/components/Nav";
 import { useRouter } from "next/navigation";
 
 function Page() {
+  const router = useRouter();
   return (
     <NextUIProvider>
       <Nav></Nav>
