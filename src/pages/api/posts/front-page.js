@@ -24,6 +24,8 @@ const connectToDatabase = async () => {
 export default async function frontPageHandler(req, res) {
   const requestBody = req.body;
   console.log("handling frint-page for:", requestBody);
+
+  console.log("MongoDB URI:", process.env.MONGODB_URI);
   connectToDatabase();
 
   let allPosts = await postModel.find({}).lean();
