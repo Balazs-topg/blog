@@ -49,6 +49,7 @@ export default async function infoHandler(req, res) {
   };
 
   post.comments = await getCommentsWithAuthorUsername(post);
+  post.comments = post.comments.reverse();
 
   let account = await accountModel.findById(String(post.author));
   post.authorUsername = account.username;

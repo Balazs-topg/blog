@@ -62,7 +62,7 @@ export default async function frontPageHandler(req, res) {
   } catch {}
 
   // Respond to client
-  console.log("Responding with:", allPosts);
+  console.log("Responding with:", allPosts.reverse());
   res.status(200).send(allPosts);
   console.log("Handled!");
 }

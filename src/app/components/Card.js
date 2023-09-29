@@ -197,8 +197,12 @@ function Card({
     JSON.parse(localStorage.getItem("userInfo"))
   );
 
+  function limitString(string = "", limit = 0) {
+    return string.substring(0, limit);
+  }
+
   return (
-    <div className="bg-zinc-700 border border-zinc-600 rounded-2xl text-white p-4 space-y-2 shadow-lg">
+    <div className="bg-zinc-700 border border-zinc-600 rounded-2xl text-white p-4 space-y-2 shadow-lg overflow-hidden">
       <div className=" font-semibold">
         {title}{" "}
         <span className=" opacity-60">
@@ -208,7 +212,16 @@ function Card({
         </span>{" "}
         <DateComponent dateObj={new Date(time)}></DateComponent>
       </div>
-      <p>{content} </p>
+      <p className="relative">
+        {content.length >= 200 ? (
+          <>
+            {limitString(content, 200)}...{" "}
+            <div className="bg-gradient-to-t from-zinc-700 to-sky-[#FFFFFF00] w-full h-1/2 absolute bottom-0 left-0"></div>
+          </>
+        ) : (
+          limitString(content, 200)
+        )}
+      </p>
       <div className="flex items-center gap-3">
         <div
           className="flex items-center gap-3"

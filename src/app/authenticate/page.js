@@ -219,6 +219,7 @@ function LoginForm() {
             variant="faded"
             isInvalid={loginError}
             value={email}
+            onChange={(e) => setEmail(e.target.value)} // Add this line
           />
           <Input
             type="password"
@@ -227,6 +228,7 @@ function LoginForm() {
             variant="faded"
             isInvalid={loginError}
             value={password}
+            onChange={(e) => setPassword(e.target.value)} // Add this line
           />
           {loginError && (
             <p className="text-rose-500">Invalid email or password</p>
